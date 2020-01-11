@@ -14,27 +14,6 @@ cache:
   directories:
     - /home/travis/.cargo
 
-GH_TOKEN: &GH_TOKEN
-  secure: fx0rR5Ii1KcsydexE6QpkDbqItNdj3Lt6L5yFZaKKB/ejw9M555NkXA+0GZqV0sLZ54qfR8zTaXAf6eBFKgcG9etaCl7vTXqsvDrlssth82oki1zufP39uuoOy4WgFq8OfACOtUq7opDAgYmpaGzlFiny+c5j7asGwDtAU1Fc3JeJsvAnxHKg9+0spXFD6kBQd5CWpqDXv2rLFK0b8IM2fHAzd0PiJZQWqz//2Cj/r9rTiewtIzqigctAfOgFwYoQvfdM+0mKb4pefG+zXEGfxxQr4r5hqZ6UMO7hto3Jnm9LRjNR8dNaDQCqQ0bkdLTAMTC3nV/gZPM679yQU3KHueVjg9pleNzuKnuBgYmH9+BrlG1dW68kqA+6Xh+wIJYrLuagWhJDlCtiU6PM5QAbFg3mabPIBG3M2IHTrOVATme+iW5vpROARhgjbQEF235DyvZaT+Tml3+PY+PfcRax2DVUhvGQViv4tzppbT0PjjBlEbGct49cFLGdqZIJBiVrYW24I2QkENTnUgZsFIBuJlVCBHZwZlLo9ldVvu4XTMKw65z42zoTzobjtbC1QPEZPiaJXSxC7W569fqL/ORXwGToFk6rQjXwEqDP2okGiusR75LXrZD6qFibNpqeypRFtqOzntsOfTUGrlaN1yTt/6dz0V0j9uI7a9/CHVcblI=
-
-DEPLOY_TO_GITHUB: &DEPLOY_TO_GITHUB
-  before_deploy:
-    - git config --local user.name "Ashley Williams"
-    - git config --local user.email "ashley666ashley@gmail.com"
-    - name="wasm-pack-$TRAVIS_TAG-$TARGET"
-    - mkdir $name
-    - cp target/$TARGET/release/wasm-pack $name/
-    - cp README.md LICENSE-MIT LICENSE-APACHE $name/
-    - tar czvf $name.tar.gz $name
-  deploy:
-    provider: releases
-    api_key: *GH_TOKEN
-    file: wasm-pack-$TRAVIS_TAG-$TARGET.tar.gz
-    skip_cleanup: true
-    on:
-      branch: master
-      tags: true
-
 matrix:
   include:
 
@@ -66,14 +45,6 @@ matrix:
     - (cd docs && mv _theme theme && mdbook build)
     - rustc ./docs/_installer/build-installer.rs
     - ./build-installer
-    deploy:
-      provider: pages
-      skip-cleanup: true
-      github-token: *GH_TOKEN
-      local-dir: docs
-      keep-history: false
-      on:
-        branch: master
 
   - name: Linux Binary
     env: TARGET=x86_64-unknown-linux-musl
@@ -84,7 +55,6 @@ matrix:
       apt:
         packages:
           - musl-tools
-    <<: *DEPLOY_TO_GITHUB
 
   - name: macOS Binary
     env: MACOSX_DEPLOYMENT_TARGET=10.7 TARGET=x86_64-apple-darwin
@@ -92,7 +62,6 @@ matrix:
     rust: stable
     script: cargo build --release --target $TARGET --locked
     install: true
-    <<: *DEPLOY_TO_GITHUB
 
 notifications:
   email:
