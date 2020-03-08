@@ -274,7 +274,11 @@ impl Fixture {
         INSTALL_WASM_BINDGEN.call_once(|| {
             download().unwrap();
         });
-        download().unwrap().binary("wasm-bindgen").unwrap()
+        if let install::Status::Found(dl) = download().unwrap() {
+            dl.binary("wasm-bindgen").unwrap()
+        } else {
+            panic!("Download failed")
+        }
     }
 
     pub fn install_wasm_opt(&self) {
@@ -309,7 +313,11 @@ impl Fixture {
         INSTALL_CARGO_GENERATE.call_once(|| {
             download().unwrap();
         });
-        download().unwrap().binary("cargo-generate").unwrap()
+        if let install::Status::Found(dl) = download().unwrap() {
+            dl.binary("cargo-generate").unwrap()
+        } else {
+            panic!("Download failed")
+        }
     }
 
     /// Download `geckodriver` and return its path.

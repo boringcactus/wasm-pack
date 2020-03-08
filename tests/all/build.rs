@@ -297,6 +297,20 @@ fn build_force() {
 }
 
 #[test]
+fn build_from_new() {
+    let fixture = utils::fixture::not_a_crate();
+    let name = "generated-project";
+    fixture.wasm_pack().arg("new").arg(name).assert().success();
+    let project_location = fixture.path.join(&name);
+    fixture
+        .wasm_pack()
+        .arg("build")
+        .arg(&project_location)
+        .assert()
+        .success();
+}
+
+#[test]
 fn bin_crate_behavior_identical() {
     let fixture = utils::fixture::bin_crate();
     fixture.install_local_wasm_bindgen();
